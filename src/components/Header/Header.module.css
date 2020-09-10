@@ -1,0 +1,9 @@
+.headerBlock {
+	height: 90px;
+}
+
+.header {
+	font-size: 40px;
+	font-weight: 700;
+	color: rgb(0, 106, 177);
+}
