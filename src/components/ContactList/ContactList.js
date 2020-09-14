@@ -4,20 +4,23 @@ import popIn from "../../utils/transitions/pop.module.css";
 import slideIn from "../../utils/transitions/slide.module.css";
 import styles from "./ContactList.module.css";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteContact, uploadContactList } from "../../redux/actions/contacts";
+import {
+  asyncDeleteContact,
+  uploadContactList,
+} from "../../redux/actions/contacts";
 import { get, save } from "../../utils/storage";
 
 const ContactList = () => {
   const dispatch = useDispatch();
-  const contactList = useSelector(state => state.contacts);
-  const filter = useSelector(state => state.filter);
+  const contactList = useSelector((state) => state.contacts);
+  const filter = useSelector((state) => state.filter);
 
-  const onDelete = id => {
-    dispatch(deleteContact(id));
+  const onDelete = (id) => {
+    dispatch(asyncDeleteContact(id));
   };
 
   const filteredList = contactList.filter(
-    contact =>
+    (contact) =>
       contact.name.toLowerCase().includes(filter.toLowerCase().trim()) ||
       contact.number.includes(filter.trim())
   );
@@ -43,7 +46,7 @@ const ContactList = () => {
       </CSSTransition>
 
       <TransitionGroup component="ul" className={styles.contactList}>
-        {filteredList.map(contact => (
+        {filteredList.map((contact) => (
           <CSSTransition key={contact.id} classNames={popIn} timeout={250}>
             <li className={styles.contactListItem}>
               <span className={styles.name}>{contact.name}</span>
