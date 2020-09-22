@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-// import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import styles from "./InputForm.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { asyncAddContact } from "../../redux/actions/contacts";
+import { constactsSelector } from "../../redux/selectors";
 
 const InputForm = () => {
-  const contacts = useSelector((state) => state.contacts);
+  const contacts = useSelector((state) => constactsSelector(state));
+
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");

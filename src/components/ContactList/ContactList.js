@@ -6,27 +6,34 @@ import styles from "./ContactList.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import {
   asyncDeleteContact,
-  uploadContactList,
+  asyncSetContactList,
 } from "../../redux/actions/contacts";
 import { get, save } from "../../utils/storage";
+import {
+  constactsSelector,
+  errorSelector,
+  filteredContactSelector,
+  loaderSelector,
+} from "../../redux/selectors";
+import LoaderSection from "../Loader/Loader";
+import Modal from "../Modal/Modal";
+import Error from "../Error/Error";
 
 const ContactList = () => {
   const dispatch = useDispatch();
-  const contactList = useSelector((state) => state.contacts);
-  const filter = useSelector((state) => state.filter);
+  const contactList = useSelector((state) => constactsSelector(state));
+  const filteredContacts = useSelector((state) =>
+    filteredContactSelector(state)
+  );
+  const loader = useSelector((state) => loaderSelector(state));
+  const error = useSelector((state) => errorSelector(state));
 
   const onDelete = (id) => {
     dispatch(asyncDeleteContact(id));
   };
 
-  const filteredList = contactList.filter(
-    (contact) =>
-      contact.name.toLowerCase().includes(filter.toLowerCase().trim()) ||
-      contact.number.includes(filter.trim())
-  );
-
   useEffect(() => {
-    dispatch(uploadContactList(get("contacts")));
+    dispatch(asyncSetContactList(get("contacts")));
   }, [dispatch]);
 
   useEffect(() => {
@@ -35,6 +42,16 @@ const ContactList = () => {
 
   return (
     <>
+      {loader && (
+        <Modal>
+          <LoaderSection />
+        </Modal>
+      )}
+      {error && (
+        <Modal>
+          <Error />
+        </Modal>
+      )}
       <CSSTransition
         in={!contactList.length}
         timeout={250}
@@ -46,7 +63,7 @@ const ContactList = () => {
       </CSSTransition>
 
       <TransitionGroup component="ul" className={styles.contactList}>
-        {filteredList.map((contact) => (
+        {filteredContacts.map((contact) => (
           <CSSTransition key={contact.id} classNames={popIn} timeout={250}>
             <li className={styles.contactListItem}>
               <span className={styles.name}>{contact.name}</span>

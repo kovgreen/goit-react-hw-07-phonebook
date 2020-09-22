@@ -1,14 +1,17 @@
-import { ADD_CONTACT, DELETE_CONTACT, UPLOAD_CONTACT_LIST } from "../types";
+import { ADD_CONTACT, DELETE_CONTACT, SET_CONTACT } from "../types";
 import axios from "axios";
 import {
   activeAddLoader,
   inactiveAddLoader,
   activeDeleteLoader,
   inactiveDeleteLoader,
+  activeSetLoader,
+  inactiveSetLoader,
 } from "./loader";
 import {
   setPostRequestError,
   setDeleteRequestError,
+  setSetContactsError,
   errorReset,
 } from "./error";
 
@@ -22,8 +25,8 @@ export const deleteContact = (id) => ({
   payload: id,
 });
 
-export const uploadContactList = (contacts) => ({
-  type: UPLOAD_CONTACT_LIST,
+export const setContactList = (contacts) => ({
+  type: SET_CONTACT,
   payload: contacts,
 });
 
@@ -53,9 +56,31 @@ export const asyncAddContact = ({ name, number }) => async (dispatch) => {
 
 export const asyncDeleteContact = (id) => async (dispatch) => {
   dispatch(activeDeleteLoader());
-  await axios
-    .delete(`http://localhost:5001/contacts/${id}`)
-    .then((res) => dispatch(deleteContact(id)))
-    .catch((error) => dispatch(setDeleteRequestError()))
-    .finally(() => dispatch(inactiveDeleteLoader()));
+  try {
+    dispatch(errorReset());
+    await axios.delete(`http://localhost:5001/contacts/${id}`);
+    dispatch(deleteContact(id));
+  } catch (error) {
+    dispatch(setDeleteRequestError());
+  } finally {
+    dispatch(inactiveDeleteLoader());
+  }
+  //   await axios
+  //     .delete(`http://localhost:5001/contacts/${id}`)
+  //     .then((res) => dispatch(deleteContact(id)))
+  //     .catch((error) => dispatch(setDeleteRequestError()))
+  //     .finally(() => dispatch(inactiveDeleteLoader()));
+};
+
+export const asyncSetContactList = () => async (dispatch) => {
+  dispatch(activeSetLoader());
+  try {
+    dispatch(errorReset());
+    const result = await axios.get(`http://localhost:5001/contacts`);
+    dispatch(setContactList(result.data));
+  } catch (error) {
+    dispatch(setSetContactsError());
+  } finally {
+    dispatch(inactiveSetLoader());
+  }
 };
